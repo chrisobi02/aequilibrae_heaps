@@ -9,13 +9,9 @@ from time import sleep
 def aequilibrae_compute_skim(graph, cores):
     from aequilibrae.paths import NetworkSkimming
     # And run the skimming
-    print("skim step")
     skm = NetworkSkimming(graph)
-    print("setting core")
     skm.results.set_cores(cores)
-    print("executing")
     skm.execute()
-    print("executed")
     return skm.results.skims
 
 
@@ -49,16 +45,19 @@ def aequilibrae_testing(graph, cost: str, iters: int = 2, repeats: int = 5):
     times = t.repeat(repeat=repeats, number=iters)
     return times
 
-projects = [r"C:\Users\61435\Desktop\Aequilibrae examples\models\chicago_sketch", r"C:\Users\61435\Downloads\LongAn\LongAn"]
-iters = 5
-repeats = 1
+projects = [r"C:\Users\61435\Desktop\Aequilibrae examples\models\chicago_sketch"]#, r"C:\Users\61435\Downloads\LongAn\LongAn"]
+iters = 1
+repeats = 5
 
 def bench():
     info = []
-    parser = ArgumentParser()
-    parser.add_argument("--name", dest="name", default="Binary")
-    args = vars(parser.parse_args())
 
+    parser = ArgumentParser()
+    parser.add_argument("--name", dest="name", default="name")
+    parser.add_argument("--out", dest="path", default= r"C:\Users\61435\Desktop\aequilibrae\aequilibrae\paths\heaps\utils/")
+    parser.add_argument("--graphs", dest="graphs", default=[])
+    args = vars(parser.parse_args())
+    print("benching: " + args["name"])
     with warnings.catch_warnings():
         warnings.simplefilter(action="ignore", category=FutureWarning)
         # pandas future warnings are really annoying FIXME
@@ -73,14 +72,10 @@ def bench():
             df = pd.DataFrame({"runtime": [x / iters for x in t.repeat(repeat=repeats, number=iters)]})
             df["heap"] = args["name"]
             df["project_name"] = proj.split("\\")[-1]
-
-            print(df)
             info.append(df)
-        print("skim complete")
-        print(info)
         summary = pd.concat(info)
         print(summary)
-        summary.to_csv(args["name"]+".csv")
+        summary.to_csv(args["path"]+ args["name"]+".csv")
 
 
 if __name__ == "__main__":

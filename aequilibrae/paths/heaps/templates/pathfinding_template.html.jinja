@@ -2,11 +2,9 @@
 {{HEAP_PATH}}
 """
 cimport cython
-from libc.math cimport isnan
+from libc.math cimport isnan, INFINITY
 #distutils language=c++
 include {{HEAP_PATH}}
-{{PARAM}}
-
 
 from libc.stdlib cimport abort, malloc, free
 
@@ -178,7 +176,7 @@ cdef void skim_single_path(long origin,
     # sets all skims to infinity
     for i in range(nodes):
         for j in range(skims):
-            node_skims[i, j] = INFINITE
+            node_skims[i, j] = INFINITY
 
     # Zeroes the intrazonal cost
     for j in range(skims):
@@ -215,7 +213,7 @@ cpdef void skim_multiple_fields(long origin,
     # sets all skims to infinity
     for i in range(nodes):
         for j in range(skims):
-            node_skims[i, j] = INFINITE
+            node_skims[i, j] = INFINITY
 
     # Zeroes the intrazonal cost
     for j in range(skims):

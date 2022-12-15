@@ -4,13 +4,15 @@ from cPython cimport PyList_New
 
 # distutils: language = c++
 # Set the number of children in the heap
-cdef int K = 2
+include 'parameters.pxi'
+
+
 
 cdef struct Node:
     #index of the node in the array
     unsigned int arr_index
     #index that relates to weights etc.
-    unsigned int index
+    ITYPE_t index
     #State of the node, Dijkstra implementation specific
     #   SCANNED = 1
     #   NOT_IN_HEAP = 2
@@ -54,11 +56,11 @@ cdef void insert_node(Heap * heap, Node * node) nogil:
         heap.last_elem = 2 * heap.next_available_index
         heap.heap = <Node**> realloc(heap.heap, (heap.last_elem + 2) * sizeof(Node *))
 
-cdef void init_insert_node(Heap * heap, double val=0) nogil:
+cdef void init_insert_node(Heap * heap, DTYPE_t val=0) nogil:
     """
     Utility method that creates and inserts a given node in one method call.
 
-    :param heap: BinaryHeap pointer that the node is being inserted to 
+    :param heap: BinaryHeap pointer that the node is being inserted to
     :param val: Value assigned to the node
     :return: None
     """
@@ -84,9 +86,9 @@ cdef Node * remove_min(Heap * heap) nogil:
         down_heap(heap, heap.heap[0])
     return minim
 
-cdef void decrease_val(Heap* heap, Node * node, double val) nogil:
+cdef void decrease_val(Heap* heap, Node * node, DTYPE_t val) nogil:
     """
-    Changes the value stored in the input node and restructures the heap accordingly. 
+    Changes the value stored in the input node and restructures the heap accordingly.
     It should be noted the value can also be increased
     :param heap: KHeap
     :param node: Node in question
@@ -111,16 +113,16 @@ cdef void down_heap(Heap * heap, Node * node) nogil:
     cdef int a = node.arr_index
     #Memory safe check to make sure we aren't venturing into unknown territory (uninitialised memory)/child checking
     cdef int child = 0
-    while (K * a) + (child + 1) < heap.next_available_index and child < K:
+    while (8 * a) + (child + 1) < heap.next_available_index and child < 8:
         child+=1
     if child == 0:
         return
     cdef int b
-    cdef Node* min_child = heap.heap[(K*a)+1]
+    cdef Node* min_child = heap.heap[(8*a)+1]
     cdef int i
     for i in range(2, child+1):
-        if min_child.val > heap.heap[K*a+i].val:
-            min_child = heap.heap[K*a+i]
+        if min_child.val > heap.heap[8*a+i].val:
+            min_child = heap.heap[8*a+i]
     b = min_child.arr_index
     if node.val <= heap.heap[b].val:
         return
@@ -141,7 +143,7 @@ cdef void up_heap(Heap * heap, Node * node) nogil:
     :return: read the function definition
     """
     cdef int a = node.arr_index
-    cdef int b = (a - 1) / K
+    cdef int b = (a - 1) / 8
     if a == 0 or node.val >= heap.heap[b].val:
         return
     cdef Node * swapped = heap.heap[b]
@@ -153,7 +155,7 @@ cdef void up_heap(Heap * heap, Node * node) nogil:
     up_heap(heap, node)
 
 #Node methods
-cdef Node* initialize_node(Node* node, unsigned int index, double val=0) nogil:
+cdef Node* initialize_node(Node* node, ITYPE_t index, DTYPE_t val=0) nogil:
     """
     Initialises a node with the input index and value, and returns a pointer to it
     :param index: index in relation to the graph costs

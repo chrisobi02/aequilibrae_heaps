@@ -112,7 +112,8 @@ def render_template(heap_path: str):
     template = env.get_template("pathfinding_template.html.jinja")
     out = template.render(HEAP_PATH=f"'{heap_path}'", 
                           MIN_ELEM=min_elem_checker.get(heap_type, "heap.next_available_index != 0"),
-                          PARAM="include 'parameters.pxi'" if min_elem_checker.get(heap_type, None) is None else "")
+                         # PARAM="include 'parameters.pxi'" if min_elem_checker.get(heap_type, None) is None else ""
+     )
     with open('aequilibrae/paths/basic_path_finding.pyx', 'w') as f:
         f.write(out)
 
@@ -120,14 +121,31 @@ if __name__ == "__main__":
     #validate(heaps)
     with warnings.catch_warnings():
         warnings.simplefilter(action="ignore", category=FutureWarning)
-        for heap in heaps[0:1]:
-            print("rendering ", heap)
+        print(heaps)
+        for heap in heaps:
+            if "kheap" in heap:
+                env = Environment(loader=PackageLoader("benchmark", "templates"))
+                template = env.get_template("k_heap.jinja")
+                out = template.render(K=8)
+                with open('aequilibrae/paths/heaps/kheap.pyx', 'w') as f:
+                    f.write(out)
+
+            print("rendering ", heap.split(".")[0])
             render_template(relative_heap_path + heap)
             print("compiling")
             subprocess.run(["python", "setup_Assignment.py", "build_ext", "--inplace"],
                            cwd=r"C:\Users\61435\Desktop\aequilibrae\aequilibrae\paths"
                            )
             print("compilation complete")
-            subprocess.run(["python", path_to_heaps + "/utils/aeq_testing.py", "--name", heap.split(".")[0]],
+            subprocess.run(["python", r"heaps\utils\aeq_testing.py", "--name", heap.split(".")[0]],
                             cwd=r"C:\Users\61435\Desktop\aequilibrae\aequilibrae\paths")
         print("made it this far")
+        csvs = [f for f in os.listdir(path_to_heaps + "/utils") if f.endswith('.csv')]
+        print(csvs)
+        data = []
+        for csv in csvs:
+            data.append(pd.read_csv(path_to_heaps + "/utils/" + csv))
+        summary = pd.concat(data).groupby(["project_name", "heap"]).agg(
+            average=("runtime", "mean"), min=("runtime", "min"), max=("runtime", "max")
+        )
+        print(summary)
