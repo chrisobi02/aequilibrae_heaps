@@ -87,6 +87,30 @@ def render_template(heap_path: str):
     with open('aequilibrae/paths/basic_path_finding.pyx', 'w') as f:
         f.write(out)
 
+def make_results():
+    csvs = [f for f in os.listdir(path_to_heaps + "/utils") if f.endswith('.csv')]
+    print(csvs)
+    data = []
+    for csv in csvs:
+        data.append(pd.read_csv(path_to_heaps + "/utils/" + csv))
+    summary = pd.concat(data).groupby(["project_name", "heap"]).agg(
+        average=("runtime", "mean"), min=("runtime", "min"), max=("runtime", "max")
+    )
+    print(summary)
+
+def validate():
+    csvs = [f for f in os.listdir(path_to_heaps + "/utils") if f.endswith('.csv')]
+    print(csvs)
+    for csv1 in csvs:
+        n1 = csv1
+        csv1 = pd.read_csv(path_to_heaps + "/utils/" + csv1)
+        for csv2 in csvs:
+            n2 = csv2
+            csv2 = pd.read_csv(path_to_heaps + "/utils/" + csv2)
+            if not csv1.equals(csv2):
+                print("code machine broke")
+                raise Exception("these skims don't match: " + n1 +" " +n2)
+
 if __name__ == "__main__":
     #validate(heaps)
     with warnings.catch_warnings():
@@ -111,27 +135,6 @@ if __name__ == "__main__":
             subprocess.run(["python", r"heaps\utils\aeq_testing.py", "--name", heap.split(".")[0]],
                             cwd=r"C:\Users\61435\Desktop\aequilibrae\aequilibrae\paths")
         print("made it this far")
-        csvs = [f for f in os.listdir(path_to_heaps + "/utils") if f.endswith('.csv')]
-        print(csvs)
-        data = []
-        """for csv in csvs:
-            data.append(pd.read_csv(path_to_heaps + "/utils/" + csv))
-        summary = pd.concat(data).groupby(["project_name", "heap"]).agg(
-            average=("runtime", "mean"), min=("runtime", "min"), max=("runtime", "max")
-        )
-        print(summary)"""
+        make_results()
 
 
-
-    def validate():
-        csvs = [f for f in os.listdir(path_to_heaps + "/utils") if f.endswith('.csv')]
-        print(csvs)
-        for csv1 in csvs:
-            n1 = csv1
-            csv1 = pd.read_csv(path_to_heaps + "/utils/" + csv1)
-            for csv2 in csvs:
-                n2 = csv2
-                csv2 = pd.read_csv(path_to_heaps + "/utils/" + csv2)
-                if not csv1.equals(csv2):
-                    print("code machine broke")
-                    raise Exception("these skims don't match: " + csv1 +" " +csv2)
