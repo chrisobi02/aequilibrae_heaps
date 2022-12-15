@@ -147,11 +147,13 @@ class Graph(object):
         idx = np.argsort(nodes)
         all_nodes = nodes[idx]
         all_links = links[idx]
+        #Forward star data structure
         links_index = np.empty(all_nodes.max() + 2, np.int64)
         links_index.fill(-1)
         nlist = np.arange(all_nodes.max() + 2)
 
         y, x, _ = np.intersect1d(all_nodes, nlist, assume_unique=False, return_indices=True)
+        #Reference node index by node id
         links_index[y] = x[:]
         links_index[-1] = all_links.shape[0]
 
