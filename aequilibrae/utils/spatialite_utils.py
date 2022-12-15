@@ -12,10 +12,7 @@ from aequilibrae.utils.db_utils import has_table, safe_connect
 
 inside_qgis = False
 
-<<<<<<< HEAD
 
-=======
->>>>>>> fcdde0c (add spatialite utils for auto downloading and adding mod_splite to the path)
 def is_windows():
     return os.name == "nt"
 
@@ -74,11 +71,7 @@ def _dll_already_exists(d: os.PathLike) -> bool:
 
 
 def _download_and_extract_spatialite(directory: os.PathLike) -> None:
-<<<<<<< HEAD
     url = "https://github.com/AequilibraE/aequilibrae/releases/download/V.0.7.5/mod_spatialite-5.0.1-win-amd64.zip"
-=======
-    url = "https://polarisnetwork.s3.amazonaws.com/binaries/spatialite-loadable-modules-5.0.0-win-amd64.zip"
->>>>>>> fcdde0c (add spatialite utils for auto downloading and adding mod_splite to the path)
     zip_file = join(directory, basename(url))
 
     Path(directory).mkdir(exist_ok=True, parents=True)
@@ -99,8 +92,4 @@ def spatialize_db(conn, logger=None):
             logger.error("Problem with spatialite", e.args)
             raise e
     if not is_spatialite(conn):
-<<<<<<< HEAD
         raise RuntimeError("Something went wrong")
-=======
-        raise RuntimeError("Something went wrong")
->>>>>>> fcdde0c (add spatialite utils for auto downloading and adding mod_splite to the path)
