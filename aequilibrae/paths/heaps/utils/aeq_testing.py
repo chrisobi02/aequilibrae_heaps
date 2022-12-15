@@ -1,11 +1,9 @@
-
 from aequilibrae.project import Project
 import pandas as pd
 import warnings
 import timeit
 from argparse import ArgumentParser
-from time import sleep
-import csv
+
 
 def aequilibrae_compute_skim(graph, cores):
     from aequilibrae.paths import NetworkSkimming
@@ -40,11 +38,6 @@ def aequilibrae_init(proj_path: str, cost: str, cores: int = 0):
     graph.set_blocked_centroid_flows(False)
     return graph
 
-def aequilibrae_testing(graph, cost: str, iters: int = 2, repeats: int = 5):
-    graph = aequilibrae_init(graph, cost)
-    t = timeit.Timer(lambda: aequilibrae_compute_skim(graph))
-    times = t.repeat(repeat=repeats, number=iters)
-    return times
 
 projects = [r"C:\Users\61435\Desktop\Aequilibrae examples\models\chicago_sketch"]#, r"C:\Users\61435\Downloads\LongAn\LongAn"]
 iters = 1
