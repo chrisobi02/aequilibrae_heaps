@@ -45,11 +45,6 @@ repeats = 5
 
 def bench():
     info = []
-
-    parser = ArgumentParser()
-    parser.add_argument("--name", dest="name", default="name")
-    parser.add_argument("--out", dest="path", default= r"C:\Users\61435\Desktop\aequilibrae\aequilibrae\paths\heaps\utils/")
-    parser.add_argument("--graphs", dest="graphs", default=[])
     args = vars(parser.parse_args())
     print("benching: " + args["name"])
     with warnings.catch_warnings():
@@ -71,10 +66,8 @@ def bench():
         print(summary)
         summary.to_csv(args["path"]+ args["name"]+".csv")
 
-def validate():
+def save_skims():
     info = []
-
-
     args = vars(parser.parse_args())
     print("benching: " + args["name"])
     with warnings.catch_warnings():
@@ -101,4 +94,4 @@ if __name__ == "__main__":
                         default=r"C:\Users\61435\Desktop\aequilibrae\aequilibrae\paths\heaps\utils/")
     parser.add_argument("--graphs", dest="graphs", default=[])
     #bench()
-    validate()
+    #validate()

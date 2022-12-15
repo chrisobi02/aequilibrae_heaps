@@ -59,7 +59,6 @@ def validate():
                 raise Exception("these skims don't match: " + n1 +" " +n2)
 
 if __name__ == "__main__":
-    #validate(heaps)
     with warnings.catch_warnings():
         warnings.simplefilter(action="ignore", category=FutureWarning)
         print(heaps)
