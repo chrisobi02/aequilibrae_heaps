@@ -5,6 +5,7 @@ import warnings
 import timeit
 from argparse import ArgumentParser
 from time import sleep
+import csv
 
 def aequilibrae_compute_skim(graph, cores):
     from aequilibrae.paths import NetworkSkimming
@@ -77,6 +78,33 @@ def bench():
         print(summary)
         summary.to_csv(args["path"]+ args["name"]+".csv")
 
+def validate():
+    info = []
+
+    parser = ArgumentParser()
+    parser.add_argument("--name", dest="name", default="name")
+    parser.add_argument("--out", dest="path",
+                        default=r"C:\Users\61435\Desktop\aequilibrae\aequilibrae\paths\heaps\utils/")
+    parser.add_argument("--graphs", dest="graphs", default=[])
+    args = vars(parser.parse_args())
+    print("benching: " + args["name"])
+    with warnings.catch_warnings():
+        warnings.simplefilter(action="ignore", category=FutureWarning)
+        # pandas future warnings are really annoying FIXME
+
+        for proj in projects:
+            print("initialising: ", proj.split("\\")[-1])
+            graph = aequilibrae_init(proj, "distance")
+
+            print("skimming")
+            skim = aequilibrae_compute_skim(graph, 0).get_matrix("distance")
+            summary = pd.DataFrame(skim)
+            print(summary)
+
+        summary.to_csv(args["path"] + args["name"] + ".csv")
+
+
 
 if __name__ == "__main__":
-    bench()
+    #bench()
+    validate()

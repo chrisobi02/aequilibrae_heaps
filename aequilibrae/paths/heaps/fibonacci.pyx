@@ -177,7 +177,6 @@ cdef Node* remove_min(Heap* heap) nogil:
     cdef Node *temp_right
     cdef Node *out
     cdef unsigned int i
-
     # make all min_node children into root nodes
     if heap.min_node.children:
         temp = leftmost_sibling(heap.min_node.children)
@@ -216,5 +215,4 @@ cdef Node* remove_min(Heap* heap) nogil:
         temp_right = temp.right_sibling
         link(heap, temp)
         temp = temp_right
-
     return out

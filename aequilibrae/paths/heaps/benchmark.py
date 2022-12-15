@@ -72,36 +72,6 @@ def bench():
 
             #Move pathfinding back into its folder and make a graph
 
-def validate(heap_paths: list):
-    import utils.aeq_testing as at
-    info = []
-    with warnings.catch_warnings():
-        warnings.simplefilter(action="ignore", category=FutureWarning)
-        cache = {}
-        for proj in projects:
-            print("caching: ", proj)
-            cache[proj] = at.aequilibrae_init(proj, "distance")
-        # pandas future warnings are really annoying FIXME
-
-        for i, path in enumerate(heap_paths):
-            # Move heap_path into paths
-            print("rendering: " + path)
-            render_template(relative_heap_path + path)
-            for j, proj in enumerate(projects):
-                print("initialising project ", proj.split("\\")[-1])
-                # run a project
-                graph = cache.get(proj)
-                print("running skim")
-                info.append(at.aequilibrae_compute_skim(graph, 0).get_matrix("distance"))
-        #Validating skims
-        for i, skm1 in enumerate(info):
-            for j, skm2 in enumerate(info):
-                if i != j:
-                    print(skm1)
-                    print(skm2)
-                    if val(skm1, skm2) is not True:
-                        raise Exception("All is not good in the hood between skim indices: ", str(i),str(j))
-        print("Skims agree, the k-dary heaps reign supremesn")
 
 def copy():
     shutil.copyfile(path_to_heaps + "/utils/basic_path_finding.pyx", "aequilibrae/paths/basic_path_finding.pyx")
@@ -123,7 +93,8 @@ if __name__ == "__main__":
         warnings.simplefilter(action="ignore", category=FutureWarning)
         print(heaps)
         for heap in heaps:
-            if "kheap" in heap:
+            if "kheap.pyx" in heap and heap in "kheap.pyx":
+                print(heap + " is the jinja kheap")
                 env = Environment(loader=PackageLoader("benchmark", "templates"))
                 template = env.get_template("k_heap.jinja")
                 out = template.render(K=8)
@@ -143,9 +114,24 @@ if __name__ == "__main__":
         csvs = [f for f in os.listdir(path_to_heaps + "/utils") if f.endswith('.csv')]
         print(csvs)
         data = []
-        for csv in csvs:
+        """for csv in csvs:
             data.append(pd.read_csv(path_to_heaps + "/utils/" + csv))
         summary = pd.concat(data).groupby(["project_name", "heap"]).agg(
             average=("runtime", "mean"), min=("runtime", "min"), max=("runtime", "max")
         )
-        print(summary)
+        print(summary)"""
+
+
+
+    def validate():
+        csvs = [f for f in os.listdir(path_to_heaps + "/utils") if f.endswith('.csv')]
+        print(csvs)
+        for csv1 in csvs:
+            n1 = csv1
+            csv1 = pd.read_csv(path_to_heaps + "/utils/" + csv1)
+            for csv2 in csvs:
+                n2 = csv2
+                csv2 = pd.read_csv(path_to_heaps + "/utils/" + csv2)
+                if not csv1.equals(csv2):
+                    print("code machine broke")
+                    raise Exception("these skims don't match: " + csv1 +" " +csv2)
